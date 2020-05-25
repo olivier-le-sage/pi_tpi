@@ -59,6 +59,7 @@ Conveniently, you can also manually do high-voltage programming by connecting RE
 ## Setup instructions on Raspbian:
 ```
 apt-get install avr-libc gcc-avr build-essential git
+apt-get install libraspberrypi-dev raspberrypi-kerbel-headers
 git clone https://github.com/cnlohr/pi_tpi
 ```
 

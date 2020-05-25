@@ -6,7 +6,7 @@ AVRASFLAGS:=$(AVRCFLAGS)
 
 
 tpiflash : gpio_tpi.c gen_ios.c tpiflash.c
-	gcc -o $@ $^ -Os
+	gcc -I/opt/vc/include -L/opt/vc/lib -lbcm_host -o $@ $^ -Os
 
 firmware.bin : firmware.c firmware.S
 	avr-gcc -I  -g $(AVRCFLAGS)   -mmcu=$(AVRPART) -Wl,-Map,firmware.map -o firmware.elf $^
