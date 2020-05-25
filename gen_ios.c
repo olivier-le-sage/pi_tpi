@@ -12,6 +12,7 @@
 
 // Peripheral base addresses for the rpi 2 and 3
 #define BCM2708_PERI_BASE       0x3F000000
+#define BCM2711_PERI_BASE       0xFE000000 // Rpi4 (for reference)
 #define GPIO_BASE              (BCM2708_PERI_BASE + 0x200000)
 
 static int gpiofd;
