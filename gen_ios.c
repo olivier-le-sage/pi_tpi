@@ -8,12 +8,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <bcm_host.h> // must link with -lbcm_host
 
+// Peripheral base addresses for the rpi 2 and 3
 #define BCM2708_PERI_BASE       0x3F000000
-#define GPIO_BASE                         (BCM2708_PERI_BASE + 0x200000)
+#define GPIO_BASE              (BCM2708_PERI_BASE + 0x200000)
 
 static int gpiofd;
-static uint32_t * gpiomem;
+static int32_t * gpiomem;
 
 //Based on http://www.pieter-jan.com/node/15
 
@@ -30,10 +32,14 @@ int InitGenGPIO()
 		return -1;
     }
 
-	//map a page of memory to gpio at offset 0x20200000 which is where GPIO goodnessstarts
-	gpiomem = (uint32_t *)mmap(0, pagesize, PROT_READ|PROT_WRITE, MAP_SHARED, gpiofd, GPIO_BASE );
+	// map a page of memory to gpio at offset 0x3F200000 -- works with Rpi 2/3
+    // To get the peripheral base in a version-robust way we can use
+    // the following built-in helper functions
+    unsigned long peri_base = bcm_host_get_peripheral_address();
+    unsigned long gpio_base = peri_base + 0x200000;
+	gpiomem = (int32_t *)mmap(0, pagesize, PROT_READ|PROT_WRITE, MAP_SHARED, gpiofd, gpio_base);
 
-	if ((int32_t)gpiomem < 0)
+	if (gpiomem == MAP_FAILED)
 	{
 		printf("Mmap (GPIO) failed: %s\n", strerror(errno));
 		gpiomem = 0;
@@ -55,8 +61,8 @@ void GPIODirection( int iono, int out )
 		INP_GPIO( iono );
 }
 
- 
- 
+
+
 #define GPIO_READ(g)  *(gpiomem  + 13) & (1<<(g))
 
 int  GPIOGet( int iono )
@@ -106,4 +112,3 @@ void GPIOSet( int iono, int turnon )
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
